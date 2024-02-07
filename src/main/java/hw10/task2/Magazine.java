@@ -1,15 +1,17 @@
 package hw10.task2;
 
+import java.util.function.Consumer;
+
 public class Magazine implements Printable {
-    private String name;
+    private final String name;
 
     public Magazine(String name) {
         this.name = name;
     }
 
     @Override
-    public void print() {
-        System.out.println("I am Magazine");
+    public void print(Consumer<String> consumer) {
+        consumer.accept("I am Magazine");
     }
 
     public static void printMagazines(Printable[] printable) {
