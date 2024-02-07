@@ -9,7 +9,7 @@ public class Main {
         printables[3] = new Magazine("ELLE");
 
         for (Printable printable : printables) {
-            printable.print();
+            printable.print(System.out::println);
         }
         Magazine.printMagazines(printables);
         Book.printBooks(printables);
