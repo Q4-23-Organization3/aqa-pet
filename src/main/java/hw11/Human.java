@@ -1,12 +1,17 @@
 package hw11;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.Scanner;
 
 public class Human extends AbstractPlayer {
 
+    private final Logger logger = LogManager.getLogger(Human.class);
     private final Scanner inputScanner;
 
     public Human() {
+        logger.info("Create Human");
         inputScanner = new Scanner(System.in);
     }
 
@@ -18,6 +23,7 @@ public class Human extends AbstractPlayer {
         String userInput = inputScanner.nextLine();
         userInput = userInput.toUpperCase();
         char firstLetter = userInput.charAt(0);
+        logger.info("User input " + userInput);
         if (firstLetter == 'R' || firstLetter == 'P' || firstLetter == 'S') {
             switch (firstLetter) {
                 case 'R':
@@ -28,6 +34,7 @@ public class Human extends AbstractPlayer {
                     return Move.SCISSORS;
             }
         } else {
+            logger.error("Incorrect input");
             throw new IllegalArgumentException("Try to use Rock, Scissors or Paper next time. Bye!");
         }
 
@@ -38,6 +45,7 @@ public class Human extends AbstractPlayer {
         System.out.print("One more try? ");
         String userInput = inputScanner.nextLine();
         userInput = userInput.toUpperCase();
+        logger.info("User input " + userInput);
         return userInput.charAt(0) == 'Y';
     }
 }
