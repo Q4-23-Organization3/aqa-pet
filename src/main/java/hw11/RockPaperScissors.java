@@ -1,11 +1,16 @@
 package hw11;
 
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class RockPaperScissors {
     private final Human user;
     private final Computer computer;
     private int userScore;
     private int computerScore;
+
+    private final Logger logger = LogManager.getLogger(RockPaperScissors.class);
 
     public RockPaperScissors() {
         user = new Human();
@@ -22,7 +27,7 @@ public class RockPaperScissors {
         try {
             userMove = user.getMove();
         } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage());
             return;
         }
         Move computerMove = computer.getMove();
@@ -30,8 +35,10 @@ public class RockPaperScissors {
         System.out.println("Computers turn " + computerMove + ".\n");
 
         int compareMoves = userMove.compareMoves(computerMove);
+        logger.debug("Comparing result: " + compareMoves);
         switch (compareMoves) {
             case 0:
+                logger.debug("Comparing result: " + compareMoves);
                 System.out.println("Tie!");
                 break;
             case 1:
@@ -48,9 +55,7 @@ public class RockPaperScissors {
             System.out.println();
             startGame();
         } else {
-            System.out.println("Your statistic:");
-            System.out.println("Wins=" + userScore);
-            System.out.println("Loses=" + computerScore);
+            System.out.println("Your statistic: \nWins=" + userScore + "\nLoses=" + computerScore);
         }
     }
 }
