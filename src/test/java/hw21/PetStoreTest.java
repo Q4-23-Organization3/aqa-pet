@@ -1,5 +1,8 @@
 package hw21;
 
+import io.qameta.allure.Attachment;
+import io.qameta.allure.Description;
+import io.qameta.allure.Step;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.Test;
@@ -12,19 +15,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class PetStoreTest {
     private final String baseUrl = "https://petstore.swagger.io/v2";
     @Test
+    @Description("Valid pet object added")
     public void addPetsTestSuccess() {
-        postPetRequest(prepareTestPet()).statusCode(200);
+        ValidatableResponse response = postPetRequest(prepareTestPet());
+        response.statusCode(200);
+        attachResponse(response.extract().asString());
     }
 
     @Test
+    @Description("Empty request body return status 405")
     public void addPetsTestFailed() {
-        given()
+        ValidatableResponse response = given()
                 .baseUri(baseUrl)
                 .when()
                 .contentType(ContentType.JSON)
                 .post("pet")
-                .then()
-                .statusCode(405);
+                .then();
+        response.statusCode(405);
+        attachResponse(response.extract().asString());
     }
 
     @Test
@@ -38,15 +46,19 @@ public class PetStoreTest {
 
         Pet actual = getPetRequest(pet.getId()).extract().as(Pet.class);
         assertEquals("new_test_name", actual.getName());
+        attachResponse("Actual updated name " + actual.getName());
     }
 
     @Test
+    @Description("Update pet object with incorrect id fails")
     public void updatePetsFailed() {
         Pet pet = prepareTestPet();
         long id = -10000;
         pet.setId(id);
         putPetRequest(pet).statusCode(200); // ?? added new pet with random id but must be 405 status
-        getPetRequest(id).statusCode(404);
+        ValidatableResponse response = getPetRequest(id);
+        response.statusCode(404);
+        attachResponse(response.extract().asString());
     }
 
     @Test
@@ -71,7 +83,9 @@ public class PetStoreTest {
                 .all()
                 .statusCode(200);
 
-        getPetRequest(id).statusCode(404);
+        ValidatableResponse response = getPetRequest(id);
+        response.statusCode(404);
+        attachResponse(response.extract().asString());
     }
 
     @Test
@@ -89,36 +103,45 @@ public class PetStoreTest {
                 .extract()
                 .as(HashMap.class);
         assertEquals(1, map.get("uniq_test_status1234"));
+        attachResponse("Count of pets with status uniq_test_status1234 = " + map.get("uniq_test_status1234"));
     }
 
     @Test
     public void getOrderFailed() {
-        given()
+        ValidatableResponse response = given()
                 .baseUri(baseUrl)
                 .when()
                 .get("store/order/100")
                 .then()
                 .log()
-                .all()
-                .statusCode(404);
+                .all();
+
+        response.statusCode(404);
+        attachResponse(response.extract().asString());
     }
     @Test
     public void getOrderSuccess() {
         Order order = prepareTestOrder();
         postOrderRequest(order);
-        getOrderRequest(order.getId()).statusCode(200);
+        ValidatableResponse response = getOrderRequest(order.getId());
+
+        response.statusCode(200);
+        attachResponse(response.extract().asString());
     }
     @Test
     public void deleteOrderFailed() {
-        given()
+        ValidatableResponse response = given()
                 .baseUri(baseUrl)
                 .when()
                 .delete("store/order/-100")
                 .then()
                 .log()
-                .all()
-                .statusCode(404);
+                .all();
+
+        response.statusCode(404);
+        attachResponse(response.extract().asString());
     }
+    @Step
     private Pet prepareTestPet() {
         Category category = Category.builder()
                 .id(321L)
@@ -137,7 +160,7 @@ public class PetStoreTest {
                 .tags(tags)
                 .build();
     }
-
+    @Step
     private Order prepareTestOrder() {
         return Order.builder()
                 .petId(123L)
@@ -148,7 +171,7 @@ public class PetStoreTest {
                 .shipDate("2024-04-23T19:30:19.852Z")
                 .build();
     }
-
+    @Step
     private ValidatableResponse getPetRequest(long id) {
         return given()
                 .baseUri(baseUrl)
@@ -159,7 +182,7 @@ public class PetStoreTest {
                 .log()
                 .all();
     }
-
+    @Step
     private ValidatableResponse putPetRequest(Pet pet) {
         return given()
                 .baseUri(baseUrl)
@@ -171,7 +194,7 @@ public class PetStoreTest {
                 .log()
                 .all();
     }
-
+    @Step
     private ValidatableResponse postPetRequest(Pet pet) {
         return given()
                 .baseUri(baseUrl)
@@ -184,6 +207,7 @@ public class PetStoreTest {
                 .all();
     }
 
+    @Step
     private ValidatableResponse postOrderRequest(Order order) {
         return given()
                 .baseUri(baseUrl)
@@ -196,6 +220,7 @@ public class PetStoreTest {
                 .all();
     }
 
+    @Step
     private ValidatableResponse getOrderRequest(long orderId) {
         return given()
                 .baseUri(baseUrl)
@@ -204,5 +229,10 @@ public class PetStoreTest {
                 .then()
                 .log()
                 .all();
+    }
+
+    @Attachment
+    public String attachResponse(String response) {
+        return response;
     }
 }
