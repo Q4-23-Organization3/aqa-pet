@@ -141,5 +141,10 @@
             <artifactId>gherkin</artifactId>
             <version>28.0.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.codeborne</groupId>
+            <artifactId>selenide</artifactId>
+            <version>6.19.1</version>
+        </dependency>
     </dependencies>
 </project>
